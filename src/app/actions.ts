@@ -5,7 +5,7 @@ export async function analyzeImageAction(image: File) {
     const formData = new FormData();
     formData.append('image', image);
 
-    const response = await fetch('/api/analyze', {
+    const response = await fetch('/api/gemini', {
       method: 'POST',
       body: formData,
     });
