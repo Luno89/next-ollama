@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const base64Image = Buffer.from(uint8Array).toString('base64');
     
     // Analyze the image using Ollama
-    var response = await ollama.generate({
+    const response = await ollama.generate({
       model: 'gemma3:latest',
       prompt: `What is in the photo?`,
     //   prompt: `You are a Pokémon card sorting assistant. 

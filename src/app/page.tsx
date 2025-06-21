@@ -1,6 +1,6 @@
 
 "use client";
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { analyzeImageAction } from './actions';
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [height, setHeight] = useState(0);
-  const [width, setWidth] = useState(320);
+  const width = 320;
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,7 +21,6 @@ export default function Home() {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const photo = photoRef.current;
     const startButton = startButtonRef.current;
 
     const constraints = {
