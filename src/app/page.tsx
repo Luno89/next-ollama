@@ -9,6 +9,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [height, setHeight] = useState(0);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo | undefined>(undefined);
   const width = 320;
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,14 +19,22 @@ export default function Home() {
   const startButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!videoRef.current || !canvasRef.current || !photoRef.current || !startButtonRef.current) return;
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      setDevices(devices);
+    });
+  }, []);
+  
+  useEffect(() => {
+    if (!videoRef.current || !canvasRef.current || !photoRef.current || !startButtonRef.current || !selectedDevice) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const startButton = startButtonRef.current;
 
     const constraints = {
-      video: true,
+      video: {
+        deviceId: selectedDevice?.deviceId,
+      },
       audio: false,
     };
 
@@ -82,7 +92,7 @@ export default function Home() {
       video.removeEventListener('canplay', () => {});
       startButton.removeEventListener('click', takePicture);
     };
-  }, []);
+  }, [selectedDevice]);
 
   const takePicture = () => {
     const canvas = canvasRef.current;
@@ -144,7 +154,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
+    <main className="min-h-screen p-8 bg-gray-50 text-gray-700">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Image Analysis with Ollama</h1>
         
@@ -152,6 +162,17 @@ export default function Home() {
           <div className="space-y-4">
             <div>
               <div className="flex flex-col gap-4">
+                <select
+                  value={selectedDevice?.deviceId}
+                  onChange={(e) => setSelectedDevice(devices.find((device) => device.deviceId === e.target.value))}
+                  className="w-full rounded-lg border border-gray-200"
+                >
+                  {devices.map((device) => (
+                    <option key={device.deviceId} value={device.deviceId}>
+                      {device.label}
+                    </option>
+                  ))}
+                </select>
                 <video
                   ref={videoRef}
                   className="w-full rounded-lg border border-gray-200"
@@ -174,7 +195,6 @@ export default function Home() {
                   />
                 </div>
               </div>
-              <canvas ref={canvasRef} id="canvas" />
               <div>
                 <img ref={photoRef} id="photo" />
               </div>
