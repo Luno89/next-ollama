@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // });
 
     const genAI = new GoogleGenAI({
-      apiKey: process.env.GOOGLE_API_KEY,
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
     });
     // const imageUpload = await genAI.files.upload({
     //     file: image,
