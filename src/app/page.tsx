@@ -156,37 +156,69 @@ export default function Home() {
   return (
     <main className="min-h-screen p-8 bg-gray-50 text-gray-700">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Image Analysis with Ollama</h1>
-        
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Pokedex</h1>
+          <p className="text-gray-600">
+            Capture photos and analyze them to identify Pokemon Cards.
+          </p>
+        </div>
+
         <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="space-y-4">
-            <div>
-              <div className="flex flex-col gap-4">
-                <select
-                  value={selectedDevice?.deviceId}
-                  onChange={(e) => setSelectedDevice(devices.find((device) => device.deviceId === e.target.value))}
-                  className="w-full rounded-lg border border-gray-200"
-                >
-                  {devices.map((device) => (
-                    <option key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </option>
-                  ))}
-                </select>
-                <video
-                  ref={videoRef}
-                  className="w-full rounded-lg border border-gray-200"
-                  autoPlay
-                  playsInline
-                />
-                <button
-                  ref={startButtonRef}
-                  onClick={takePicture}
-                  className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                >
-                  Take Photo
-                </button>
-                <canvas ref={canvasRef} className="hidden" />
+          <div className="space-y-6">
+            {/* Camera Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Select Camera
+              </label>
+              <select
+                value={selectedDevice?.deviceId}
+                onChange={(e) => setSelectedDevice(devices.find((device) => device.deviceId === e.target.value))}
+                disabled={devices.length === 0}
+                className={`w-full rounded-lg border ${
+                  devices.length === 0 ? 'border-red-300' : 'border-gray-200'
+                } p-2`}
+              >
+                {devices.length === 0 && (
+                  <option value="">No cameras found</option>
+                )}
+                {devices.map((device) => (
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Camera ${device.deviceId}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Video Preview */}
+            <div className="relative">
+              {loading && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                </div>
+              )}
+              <video
+                ref={videoRef}
+                className="w-full rounded-lg border border-gray-200"
+                autoPlay
+                playsInline
+              />
+            </div>
+            <canvas ref={canvasRef} className="hidden" />
+            {/* Photo Capture */}
+            <div className="flex flex-col items-center gap-4">
+              <button
+                ref={startButtonRef}
+                onClick={takePicture}
+                disabled={!selectedDevice || loading}
+                className={`w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white ${
+                  !selectedDevice || loading
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500'
+                }`}
+              >
+                {loading ? 'Analyzing...' : 'Take Photo'}
+              </button>
+
                 <div className="mt-4">
                   <img
                     ref={photoRef}
@@ -194,10 +226,6 @@ export default function Home() {
                     alt="Captured photo"
                   />
                 </div>
-              </div>
-              <div>
-                <img ref={photoRef} id="photo" />
-              </div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                 Upload an image
               </label>
@@ -207,7 +235,7 @@ export default function Home() {
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="mt-1 block w-full"
-              />
+              />  
             </div>
 
             <button
